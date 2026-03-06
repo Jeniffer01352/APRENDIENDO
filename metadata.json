@@ -1,5 +1,5 @@
 {
-  "name": "API Masterclass Explorer",
-  "description": "A professional tool for testing, documenting, and learning about REST APIs, built for the API Class at UTEQ.",
-  "requestFramePermissions": []
+  "name": "Aprendiendo - Hablando y Jugando",
+  "description": "Una aplicación educativa interactiva diseñada para niños con necesidades educativas especiales, enfocada en el aprendizaje silábico a través del habla y el juego.",
+  "requestFramePermissions": ["microphone"]
 }

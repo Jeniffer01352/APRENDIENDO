@@ -13,47 +13,8 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// Mock Data for API Class
-let users = [
-  { id: 1, name: "Juan Perez", email: "juan@uteq.edu.ec", role: "Student" },
-  { id: 2, name: "Maria Garcia", email: "maria@uteq.edu.ec", role: "Professor" },
-  { id: 3, name: "Carlos Lopez", email: "carlos@uteq.edu.ec", role: "Admin" },
-];
-
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
-// Mock API Endpoints
-app.get("/api/users", (req, res) => {
-    res.json(users);
-});
-
-app.get("/api/users/:id", (req, res) => {
-    const user = users.find(u => u.id === parseInt(req.params.id));
-    if (!user) return res.status(404).json({ error: "User not found" });
-    res.json(user);
-});
-
-app.post("/api/users", (req, res) => {
-    const newUser = {
-        id: users.length + 1,
-        ...req.body
-    };
-    users.push(newUser);
-    res.status(201).json(newUser);
-});
-
-app.put("/api/users/:id", (req, res) => {
-    const index = users.findIndex(u => u.id === parseInt(req.params.id));
-    if (index === -1) return res.status(404).json({ error: "User not found" });
-    users[index] = { ...users[index], ...req.body };
-    res.json(users[index]);
-});
-
-app.delete("/api/users/:id", (req, res) => {
-    users = users.filter(u => u.id !== parseInt(req.params.id));
-    res.status(204).send();
 });
 
 async function startServer() {
