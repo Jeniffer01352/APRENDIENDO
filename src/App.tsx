@@ -32,6 +32,7 @@ import SoundToggleButton from './components/SoundToggleButton';
 import { checkConnection } from './services/geminiService';
 import { Badge, SessionRecord } from './types';
 import { AVAILABLE_BADGES } from './constants';
+import { saveSession, getHistory, deleteHistory } from './services/historyService';
 
 const LOCAL_STORAGE_KEY = 'aprendiendo_profiles';
 
@@ -82,6 +83,7 @@ export default function App() {
 
   const handleDeleteProfile = (profileId: string) => {
     setProfiles(prev => prev.filter(p => p.id !== profileId));
+    deleteHistory(profileId);
     if (currentProfile?.id === profileId) {
       setCurrentProfile(null);
       setGameState(GameState.PROFILE_SELECTION);
@@ -115,14 +117,19 @@ export default function App() {
       const now = new Date().toISOString();
       if (!currentSession) {
         setCurrentSession({
+          id: `session_${Date.now()}`,
           startTime: now,
           endTime: now,
+          totalActivities: 1,
+          totalCorrect: isCorrect ? 1 : 0,
           activities: [activityRecord]
         });
       } else {
         setCurrentSession(prev => prev ? {
           ...prev,
           endTime: now,
+          totalActivities: prev.totalActivities + 1,
+          totalCorrect: isCorrect ? prev.totalCorrect + 1 : prev.totalCorrect,
           activities: [...prev.activities, activityRecord]
         } : null);
       }
@@ -167,8 +174,9 @@ export default function App() {
         if (updatedProfile.level === SyllabicLevel.ALFABETICO) awardBadge('alphabet_master');
         
         // Count total correct answers for style_master
-        const totalCorrect = updatedProfile.history.reduce((acc, session) => 
-          acc + session.activities.filter(a => a.isCorrect).length, 0
+        const history = getHistory(updatedProfile.id);
+        const totalCorrect = history.reduce((acc, session) => 
+          acc + session.totalCorrect, 0
         ) + (isCorrect ? 1 : 0);
         
         if (totalCorrect >= 20) awardBadge('style_master');
@@ -183,10 +191,12 @@ export default function App() {
   const handleSessionEnd = () => {
     if (currentProfile && currentSession) {
       const updatedProfile = { ...currentProfile };
-      updatedProfile.history = [currentSession, ...updatedProfile.history].slice(0, 20);
+      saveSession(updatedProfile.id, currentSession);
+      
+      const history = getHistory(updatedProfile.id);
       
       // Check for session_expert badge
-      if (updatedProfile.history.length >= 5 && !updatedProfile.badges.includes('session_expert')) {
+      if (history.length >= 5 && !updatedProfile.badges.includes('session_expert')) {
         updatedProfile.badges.push('session_expert');
         setNewBadge(AVAILABLE_BADGES.find(b => b.id === 'session_expert') || null);
       }

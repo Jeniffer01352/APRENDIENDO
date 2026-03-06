@@ -70,8 +70,11 @@ export interface SessionActivityRecord {
 }
 
 export interface SessionRecord {
+    id: string;
     startTime: string;
     endTime: string;
+    totalActivities: number;
+    totalCorrect: number;
     activities: SessionActivityRecord[];
 }
 
@@ -99,7 +102,6 @@ export interface UserProfile {
   currentLevel: number;
   score: number;
   correctAnswersStreak: number;
-  history: SessionRecord[];
   badges: string[];
   preferredDifficulty?: Difficulty;
   dailySessionDuration?: number;

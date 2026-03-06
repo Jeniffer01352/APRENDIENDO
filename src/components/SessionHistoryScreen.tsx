@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile } from '../types';
-import { ArrowLeft, Calendar, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, CheckCircle2, XCircle, Trophy, Activity as ActivityIcon } from 'lucide-react';
+import { getHistory } from '../services/historyService';
 
 interface SessionHistoryScreenProps {
   profile: UserProfile;
@@ -12,6 +13,8 @@ const SessionHistoryScreen: React.FC<SessionHistoryScreenProps> = ({
   profile, 
   onBack 
 }) => {
+  const history = useMemo(() => getHistory(profile.id), [profile.id]);
+
   return (
     <div className="max-w-3xl mx-auto py-8">
       <div className="flex items-center gap-4 mb-12">
@@ -25,17 +28,30 @@ const SessionHistoryScreen: React.FC<SessionHistoryScreenProps> = ({
       </div>
 
       <div className="space-y-6">
-        {profile.history.length > 0 ? (
-          profile.history.map((session, sIdx) => (
-            <div key={sIdx} className="bg-white p-8 rounded-[2.5rem] border border-stone-100 shadow-sm">
-              <div className="flex items-center gap-3 mb-6 text-stone-400 font-bold text-sm uppercase tracking-widest">
-                <Calendar className="w-4 h-4" />
-                {new Date(session.startTime).toLocaleDateString('es-ES', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
+        {history.length > 0 ? (
+          history.map((session) => (
+            <div key={session.id} className="bg-white p-8 rounded-[2.5rem] border border-stone-100 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div className="flex items-center gap-3 text-stone-400 font-bold text-sm uppercase tracking-widest">
+                  <Calendar className="w-4 h-4" />
+                  {new Date(session.startTime).toLocaleDateString('es-ES', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold">
+                    <Trophy className="w-3 h-3" />
+                    {session.totalCorrect}/{session.totalActivities}
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1 bg-stone-50 text-stone-500 rounded-full text-xs font-bold">
+                    <ActivityIcon className="w-3 h-3" />
+                    {Math.round((session.totalCorrect / session.totalActivities) * 100)}%
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-4">

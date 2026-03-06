@@ -50,7 +50,6 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
     currentLevel: 1,
     score: 0,
     correctAnswersStreak: 0,
-    history: [],
     badges: [],
     preferredDifficulty: Difficulty.NORMAL,
     fontSize: FontSize.NORMAL
